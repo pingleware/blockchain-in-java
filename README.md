@@ -3,6 +3,11 @@ Building a blockchain with smart contracts using Java instead of Ethereum and So
 
 Java is matured language and is deployed in many financial instituions, in addition Java has the large community of libraries or packages to implement any real life scenario on the Web3 stack but using Java. In addition, Java supports API consumption, so oracles will not be needed.
 
+# Java History
+Java, originally developed by Sun Microsoystems as a write once, run anywhere (WORA), as long as the target system supports Java.
+
+Teh complete history at https://www.geeksforgeeks.org/the-complete-history-of-java-programming-language/
+
 # Building
 To build requires Java JDK to be installed on your development machine.
 
