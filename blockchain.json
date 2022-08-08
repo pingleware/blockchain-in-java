@@ -4,5 +4,11 @@
         "cik": "0001766947",
         "ip": "24.254.95.149",
         "homepage": "https://redeecash.com"
+    },
+    "1": {
+        "name": "Placeholder ATS",
+        "cik": "0000000000",
+        "ip": "8.8.8.8",
+        "homepage": "https://localhost.localdomain"
     }
 }
