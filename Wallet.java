@@ -25,7 +25,7 @@ public class Wallet {
             System.out.println("Opened database successfully");        
             if (account.length() > 0) {
                 stmt = c.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT * FROM accounts WHERE wallet='" + account + "';");
+                ResultSet rs = stmt.executeQuery("SELECT * FROM accounts WHERE address='" + account + "';");
                 this.publicKey = rs.getString("publicKey");
                 this.privateKey = rs.getString("privateKey");
                 this.balance = rs.getDouble("balance");    
@@ -54,8 +54,8 @@ public class Wallet {
             this.balance = 0;
             c.setAutoCommit(false);
             stmt = c.createStatement();
-            String sql = "INSERT INTO accounts (wallet,balance,privateKey,publicKey) " +
-                        "VALUES ('"+this.publicKey+"', "+this.balance+", '"+this.privateKey+"', '"+this.publicKey+"');"; 
+            String sql = "INSERT INTO accounts (address,transactionCount,code) " +
+                        "VALUES ('"+this.publicKey+"', 0, '');"; 
             stmt.executeUpdate(sql);
         } catch(SQLException | NoSuchProviderException | NoSuchAlgorithmException ex) {
             System.err.println(ex);
