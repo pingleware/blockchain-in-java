@@ -10,6 +10,8 @@ import java.util.logging.Level;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.sql.*;
+
 public class Block {
 
 	// Every block contains
@@ -24,13 +26,32 @@ public class Block {
 
     private Logger logger;
 
+    private Connection c = null;
+    private Statement stmt = null;
+
 	// Constructor for the block
 	public Block(String data, String previousHash, long timeStamp)
 	{
-        this.data = data;
-        this.previousHash = previousHash;
-        this.timeStamp = timeStamp;
-        this.hash = calculateBlockHash();
+        String sql = "";
+        try {
+            this.data = data;
+            this.previousHash = previousHash;
+            this.timeStamp = timeStamp;
+            this.hash = calculateBlockHash();
+
+            sql = "INSERT INTO  blocks (timestamp,number,hash,parent_hash,extra_data) VALUES ("+this.timeStamp+",(SELECT COUNT(hash)+1 AS count FROM blocks),'"+this.hash+"','"+this.previousHash+"','"+this.data+"');";
+            System.out.println(sql);
+
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:blockchain.db");
+            System.out.println("Opened database successfully");        
+
+            c.setAutoCommit(false);
+            stmt = c.createStatement();
+            stmt.executeUpdate(sql);
+        } catch (SQLException | ClassNotFoundException e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage());
+        }
 	}
 
 	// Function to calculate the hash
