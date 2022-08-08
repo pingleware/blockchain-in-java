@@ -19,6 +19,7 @@ public class Block {
     private String previousHash;
     private String data;
     private long timeStamp;
+    private int difficulty;
     private int nonce;
 
     private Logger logger;
@@ -34,10 +35,10 @@ public class Block {
 
 	// Function to calculate the hash
     public String calculateBlockHash() {
-        String dataToHash = previousHash 
-          + Long.toString(timeStamp) 
-          + Integer.toString(nonce) 
-          + data;
+        String dataToHash = this.previousHash 
+          + Long.toString(this.timeStamp) 
+          + Integer.toString(this.nonce) 
+          + this.data;
         MessageDigest digest = null;
         byte[] bytes = null;
         try {
@@ -71,13 +72,19 @@ public class Block {
 
     public String mineBlock(int prefix) {
         String prefixString = new String(new char[prefix]).replace('\0', '0');
-        while (!hash.substring(0, prefix).equals(prefixString)) {
-            nonce++;
-            hash = calculateBlockHash();
+        while (!this.hash.substring(0, prefix).equals(prefixString)) {
+            this.nonce++;
+            this.hash = calculateBlockHash();
         }
         return hash;
     }
 
+    public static Block genesis() {
+        int prefix = 4;
+        String prefixString = new String(new char[prefix]).replace('\0', '0');
+        return new Block("Genesis", prefixString, new Date().getTime());
+    }
+    /*
     public static void main(String args[]) {
         List<Block> blockchain = new ArrayList<>();
         int prefix = 4;
@@ -94,4 +101,5 @@ public class Block {
         System.out.println(blockchain.get(1).getTimestamp());
         System.out.println(blockchain.get(1).getData());
     }
+    */
 }
