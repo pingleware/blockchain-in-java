@@ -58,6 +58,13 @@ public class Server {
                 throw new Exception("Not authorized as a public node?");
             }
 
+            Block.genesis();
+
+            // Create a new account
+            // Use https://random-generator.net/random-passphrase-generator/ tp create a passphrase
+            Wallet wallet = new Wallet("","schick unpunished fiercely nectary placoid mahout leakiest becurse stockiest acridly soupiest ejecting glazy crueler goodman");
+            System.out.println("account: " + wallet.publicKey);
+            System.out.println("private key: " + wallet.getPrivateKey());
             // Start JSON RPC Server
 
             // Start REST API Server

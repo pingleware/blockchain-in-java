@@ -18,15 +18,21 @@ GFG.class: GFG.java
 Transaction.class: Transaction.java 
 	javac Transaction.java
 
+Database.class: Database.java
+	javac Database.java
+
+Wallet.class: Wallet.java
+	javac Wallet.java
+
 Server.class: Server.java
 	javac Server.java
 
-blockchain.mf:
+blockchain.mf: lib/sqlite-jdbc-3.39.2.0.jar lib/json-20220320.jar
 	@echo Manifest-Version: 1.0 > blockchain.mf
 	@echo Main-Class: Server >> blockchain.mf
-	@echo Class-Path: . lib/* >> blockchain.mf
+	@echo Class-Path: . lib/sqlite-jdbc-3.39.2.0.jar lib/json-20220320.jar >> blockchain.mf
 
-blockchain.jar: Block.class Blockchain.class GFG.class Transaction.class Server.class blockchain.mf
+blockchain.jar: Block.class Blockchain.class GFG.class Transaction.class Database.class Wallet.class Server.class blockchain.mf
 	jar -cvfm blockchain.jar blockchain.mf *.class
 
 blockchain.keystore: 

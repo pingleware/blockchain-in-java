@@ -37,7 +37,7 @@ To build requires Java JDK to be installed on your development machine.
     
 ## Run an signed executable JAR from the command line
 
-    java -jar SignedBlockchain.jar
+    java  -jar SignedBlockchain.jar
 
 ## Verify a signed JAR file
 

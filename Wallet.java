@@ -7,41 +7,34 @@ import java.security.MessageDigest;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Wallet {
 
-    private String publicKey;
+    public  String publicKey;
     private String privateKey;
     private double balance;
 
-    private Connection c = null;
-    private Statement stmt = null;
-
     public Wallet(String account, String passphrase) {
-        try {
-            Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:blockchain.db");
-            System.out.println("Opened database successfully");        
-            if (account.length() > 0) {
-                stmt = c.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT * FROM accounts WHERE address='" + account + "';");
+        if (account.length() > 0) {
+            try {
+                ResultSet rs = Database.query("SELECT * FROM accounts WHERE address='" + account + "';");
                 this.publicKey = rs.getString("publicKey");
                 this.privateKey = rs.getString("privateKey");
                 this.balance = rs.getDouble("balance");    
-                rs.close();
-            } else {
-                this.create(passphrase);
-            }    
-        } catch ( Exception e ) {
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-            System.exit(0);
-        }
+                rs.close();    
+            } catch(SQLException ex) {
+                System.err.println(ex);
+            }
+        } else {
+            this.create(passphrase);
+        }    
     }
 
-    public void create(String passphrase) {
+    public Wallet create(String passphrase) {
         try {
-            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA", passphrase);
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
             KeyPair pair = keyGen.generateKeyPair();
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] bytes = digest.digest(pair.getPublic().toString().getBytes(StandardCharsets.UTF_8));
@@ -52,13 +45,16 @@ public class Wallet {
             this.privateKey = pair.getPrivate().toString();
             this.publicKey = buffer.toString();    
             this.balance = 0;
-            c.setAutoCommit(false);
-            stmt = c.createStatement();
-            String sql = "INSERT INTO accounts (address,transactionCount,code) " +
-                        "VALUES ('"+this.publicKey+"', 0, '');"; 
-            stmt.executeUpdate(sql);
-        } catch(SQLException | NoSuchProviderException | NoSuchAlgorithmException ex) {
+            String sql = "INSERT INTO accounts (address,transactionCount,code) VALUES ('"+this.publicKey+"', 0, '"+passphrase+"');"; 
+            Database.insert(sql);
+            return this;
+        } catch(NoSuchAlgorithmException ex) {
             System.err.println(ex);
         }
+        return null;
+    }
+
+    public String getPrivateKey() {
+        return this.privateKey;
     }
 }

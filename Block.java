@@ -10,8 +10,6 @@ import java.util.logging.Level;
 import java.util.ArrayList;
 import java.util.List;
 
-import java.sql.*;
-
 public class Block {
 
 	// Every block contains
@@ -26,32 +24,27 @@ public class Block {
 
     private Logger logger;
 
-    private Connection c = null;
-    private Statement stmt = null;
 
 	// Constructor for the block
+    /**
+     *  int prefix = 4;
+     *  String previousHash = new String(new char[prefix]).replace('\0', '0');
+     *  long timeStamp = new Date().getTime();
+     * 
+     * @param data
+     * @param previousHash
+     * @param timeStamp
+     */
 	public Block(String data, String previousHash, long timeStamp)
 	{
-        String sql = "";
-        try {
-            this.data = data;
-            this.previousHash = previousHash;
-            this.timeStamp = timeStamp;
-            this.hash = calculateBlockHash();
+        this.data = data;
+        this.previousHash = previousHash;
+        this.timeStamp = timeStamp;
+        this.hash = calculateBlockHash();
 
-            sql = "INSERT INTO  blocks (timestamp,number,hash,parent_hash,extra_data) VALUES ("+this.timeStamp+",(SELECT COUNT(hash)+1 AS count FROM blocks),'"+this.hash+"','"+this.previousHash+"','"+this.data+"');";
-            System.out.println(sql);
-
-            Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:blockchain.db");
-            System.out.println("Opened database successfully");        
-
-            c.setAutoCommit(false);
-            stmt = c.createStatement();
-            stmt.executeUpdate(sql);
-        } catch (SQLException | ClassNotFoundException e ) {
-            System.err.println( e.getClass().getName() + ": " + e.getMessage());
-        }
+        String sql = getQuery(data, previousHash, timeStamp);
+        System.out.println(sql);
+        Database.insert(sql);
 	}
 
 	// Function to calculate the hash
@@ -67,6 +60,26 @@ public class Block {
             bytes = digest.digest(dataToHash.getBytes(StandardCharsets.UTF_8));
         } catch (NoSuchAlgorithmException ex) {
             logger.log(Level.SEVERE, ex.getMessage());
+        }
+        StringBuffer buffer = new StringBuffer();
+        for (byte b : bytes) {
+            buffer.append(String.format("%02x", b));
+        }
+        return buffer.toString();
+    }
+
+    public static String newHash(String previousHash,long timeStamp,int nonce,String data) {
+        String dataToHash = previousHash 
+          + Long.toString(timeStamp) 
+          + Integer.toString(nonce) 
+          + data;
+        MessageDigest digest = null;
+        byte[] bytes = null;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+            bytes = digest.digest(dataToHash.getBytes(StandardCharsets.UTF_8));
+        } catch (NoSuchAlgorithmException ex) {
+            System.out.println(ex.getMessage());
         }
         StringBuffer buffer = new StringBuffer();
         for (byte b : bytes) {
@@ -104,6 +117,12 @@ public class Block {
         int prefix = 4;
         String prefixString = new String(new char[prefix]).replace('\0', '0');
         return new Block("Genesis", prefixString, new Date().getTime());
+    }
+
+    public static String getQuery(String data,String previousHash,long timeStamp) {
+        String hash = newHash(previousHash,timeStamp,1,data);
+
+        return "INSERT INTO  blocks (timestamp,number,hash,parent_hash,extra_data) VALUES ("+timeStamp+",(SELECT COUNT(hash)+1 AS count FROM blocks),'"+hash+"','"+previousHash+"','"+data+"');";
     }
     /*
     public static void main(String args[]) {
