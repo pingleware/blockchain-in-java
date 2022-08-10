@@ -9,18 +9,20 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Block {
 
 	// Every block contains
 	// a hash, previous hash and
 	// data of the transaction made
-    private String hash;
-    private String previousHash;
+    public  String hash;
+    public  String previousHash;
     private String data;
-    private long timeStamp;
+    public  long timeStamp;
     private int difficulty;
-    private int nonce;
+    public  int nonce;
 
     private Logger logger;
 
@@ -35,37 +37,64 @@ public class Block {
      * @param previousHash
      * @param timeStamp
      */
-	public Block(String data, String previousHash, long timeStamp)
+	public Block(String data)
 	{
-        this.data = data;
-        this.previousHash = previousHash;
-        this.timeStamp = timeStamp;
-        this.hash = calculateBlockHash();
-
-        String sql = getQuery(data, previousHash, timeStamp);
-        System.out.println(sql);
-        Database.insert(sql);
+            this.data = data;
+            this.timeStamp = new Date().getTime();
+            this.previousHash = getPreviousHashString();
+            this.nonce = getNONCE();
+            this.hash = newHash(this.previousHash,this.timeStamp,this.nonce,this.data);
+    
+            //String sql = "INSERT INTO  blocks (timestamp,number,hash,parent_hash,extra_data) VALUES ("+this.timeStamp+",(SELECT COUNT(hash)+1 AS count FROM blocks),'"+this.hash+"','(SELECT hash FROM blocks LIMIT 1)','"+this.data+"');";
+            String sql = getQuery(this.hash, this.previousHash, this.nonce, this.timeStamp, this.data);
+            System.out.println(sql);
+            Database.insert(sql);
 	}
 
 	// Function to calculate the hash
     public String calculateBlockHash() {
-        String dataToHash = this.previousHash 
-          + Long.toString(this.timeStamp) 
-          + Integer.toString(this.nonce) 
-          + this.data;
         MessageDigest digest = null;
         byte[] bytes = null;
         try {
+            String sql = "SELECT hash, COUNT(hash) AS nonce FROM blocks LIMIT 1";
+            System.out.println(sql);
+            ResultSet rs = Database.query(sql);
+            System.out.println(rs);
+            String previousHash = Database.rs.getString("hash");
+            this.previousHash = previousHash;
+            System.out.println(this.previousHash);
+            int nonce = Database.rs.getInt("nonce");
+            this.nonce = nonce;
+            System.out.println(this.nonce);
+    
+            String dataToHash = this.previousHash 
+              + Long.toString(this.timeStamp) 
+              + Integer.toString(this.nonce) 
+              + this.data;
+
+            System.out.println(dataToHash);
+    
             digest = MessageDigest.getInstance("SHA-256");
             bytes = digest.digest(dataToHash.getBytes(StandardCharsets.UTF_8));
-        } catch (NoSuchAlgorithmException ex) {
+
+            StringBuffer buffer = new StringBuffer();
+            for (byte b : bytes) {
+                buffer.append(String.format("%02x", b));
+            }
+            return buffer.toString();
+        } catch (SQLException | NoSuchAlgorithmException ex) {
             logger.log(Level.SEVERE, ex.getMessage());
+        } finally {
+            try {
+                if (Database.connection != null) {
+                    Database.connection.close();
+                }
+            } catch(SQLException e) {
+                // connection close failed.
+                System.err.println(e);
+            }
         }
-        StringBuffer buffer = new StringBuffer();
-        for (byte b : bytes) {
-            buffer.append(String.format("%02x", b));
-        }
-        return buffer.toString();
+        return null;
     }
 
     public static String newHash(String previousHash,long timeStamp,int nonce,String data) {
@@ -79,7 +108,7 @@ public class Block {
             digest = MessageDigest.getInstance("SHA-256");
             bytes = digest.digest(dataToHash.getBytes(StandardCharsets.UTF_8));
         } catch (NoSuchAlgorithmException ex) {
-            System.out.println(ex.getMessage());
+            System.err.println(ex.getStackTrace());
         }
         StringBuffer buffer = new StringBuffer();
         for (byte b : bytes) {
@@ -114,15 +143,49 @@ public class Block {
     }
 
     public static Block genesis() {
-        int prefix = 4;
-        String prefixString = new String(new char[prefix]).replace('\0', '0');
-        return new Block("Genesis", prefixString, new Date().getTime());
+        return new Block("Genesis");
     }
 
-    public static String getQuery(String data,String previousHash,long timeStamp) {
-        String hash = newHash(previousHash,timeStamp,1,data);
+    public static String getPreviousHashString() {
+        try {
+            ResultSet rs = Database.query("SELECT hash FROM blocks ORDER BY number DESC");
+            return rs.getString("hash");
+        } catch(SQLException ex) {
+            System.out.println(ex.getMessage());
+        } finally {
+            try {
+                if (Database.connection != null) {
+                    Database.connection.close();
+                }
+            } catch(SQLException e) {
+                // connection close failed.
+                System.err.println(e);
+            }
+        }
+        return null;
+    }
 
-        return "INSERT INTO  blocks (timestamp,number,hash,parent_hash,extra_data) VALUES ("+timeStamp+",(SELECT COUNT(hash)+1 AS count FROM blocks),'"+hash+"','"+previousHash+"','"+data+"');";
+    public static int getNONCE() {
+        try {
+            ResultSet rs = Database.query("SELECT COUNT(hash) AS nonce FROM blocks;");
+            return rs.getInt("nonce");
+        } catch(SQLException ex) {
+            System.out.println(ex.getMessage());
+        } finally {
+            try {
+                if (Database.connection != null) {
+                    Database.connection.close();
+                }
+            } catch(SQLException e) {
+                // connection close failed.
+                System.err.println(e);
+            }
+        }
+        return 0;
+    }
+
+    public static String getQuery(String hash,String previousHash,int nonce,long timeStamp,String data) {
+        return "INSERT INTO  blocks (timestamp,number,hash,parent_hash,extra_data) VALUES ("+timeStamp+",(SELECT COUNT(hash)+1 AS count FROM blocks),'"+hash+"','"+previousHash+"','"+data+"');";    
     }
     /*
     public static void main(String args[]) {

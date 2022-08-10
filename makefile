@@ -5,6 +5,7 @@ clean:
 	del blockchain.jar
 	del blockchain.mf
 	del *.class
+	del contracts/*.class
 	
 Block.class: Block.java
 	javac Block.java
@@ -24,16 +25,40 @@ Database.class: Database.java
 Wallet.class: Wallet.java
 	javac Wallet.java
 
+ConvertObject.class: ConvertObject.java
+	javac ConvertObject.java
+
 Server.class: Server.java
 	javac Server.java
+
+contracts/EIP20.class: contracts/EIP20.java
+	javac contracts/EIP20.java
+
+contracts/EIP20Listener.class: contracts/EIP20Listener.java
+	javac contracts/EIP20Listener.java
+
+contracts/EIP165.class: contracts/EIP165.java
+	javac contracts/EIP165.java
+
+contracts/EIP721.class: contracts/EIP721.java
+	javac contracts/EIP721.java
+
+contracts/EIP721Listener.class: contracts/EIP721Listener.java
+	javac contracts/EIP721Listener.java
+
+contracts/EIP721Metadata.class: contracts/EIP721Metadata.java
+	javac contracts/EIP721Metadata.java
+
+contracts/EIP721TokenReceiver.class: contracts/EIP721TokenReceiver.java
+	javac contracts/EIP721TokenReceiver.java
 
 blockchain.mf: lib/sqlite-jdbc-3.39.2.0.jar lib/json-20220320.jar
 	@echo Manifest-Version: 1.0 > blockchain.mf
 	@echo Main-Class: Server >> blockchain.mf
-	@echo Class-Path: . lib/sqlite-jdbc-3.39.2.0.jar lib/json-20220320.jar >> blockchain.mf
+	@echo Class-Path: . contracts lib/sqlite-jdbc-3.39.2.0.jar lib/json-20220320.jar >> blockchain.mf
 
-blockchain.jar: Block.class Blockchain.class GFG.class Transaction.class Database.class Wallet.class Server.class blockchain.mf
-	jar -cvfm blockchain.jar blockchain.mf *.class
+blockchain.jar: Block.class Blockchain.class GFG.class Transaction.class Database.class Wallet.class ConvertObject.class Server.class blockchain.mf contracts/EIP20.class contracts/EIP20Listener.class contracts/EIP721TokenReceiver.class contracts/EIP721Metadata.class contracts/EIP721Listener.class contracts/EIP721.class contracts/EIP165.class
+	jar -cvfm blockchain.jar blockchain.mf *.class contracts/*.class
 
 blockchain.keystore: 
 	keytool -genkey -v -keystore blockchain.keystore -alias blockchain -keyalg RSA -keysize 2048 -validity 10000

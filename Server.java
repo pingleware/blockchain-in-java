@@ -19,10 +19,105 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.lang.ClassLoader;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.io.File;  // Import the File class
+import java.io.FileNotFoundException;  // Import this class to handle errors
+import java.util.Scanner; // Import the Scanner class to read text files
 
-public class Server {
+import java.util.*;
+
+public class Server extends ClassLoader {
 
     private static ArrayList<String> ipAddress;
+
+    @Override
+    public Class<?> findClass(String address) throws ClassNotFoundException {
+        byte[] b = loadClassFromDatabase(address);
+        return defineClass(address, b, 0, b.length);
+    }
+
+    private byte[] loadClassFromDatabase(String address)  {
+
+        byte[] buffer;
+        int nextValue = 0;
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+
+        try {
+            String sql = "SELECT * FROM contracts WHERE address='"+address+"';";
+            ResultSet rs = Database.query(sql);
+            InputStream inputStream = getClass().getClassLoader().getResourceAsStream(rs.getString("bytecode"));
+
+            while ( (nextValue = inputStream.read()) != -1 ) {
+                byteStream.write(nextValue);
+            }
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+        buffer = byteStream.toByteArray();
+        return buffer;
+    }    
+
+    public static void saveClass(String className, String _owner, double _amount) {
+        String contents = "";
+
+        try {
+            File myObj = new File("contracts/" + className + ".java");
+            Scanner myReader = new Scanner(myObj);
+            while (myReader.hasNextLine()) {
+              contents += myReader.nextLine();
+            }
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }  
+        System.out.println(contents);      
+        Block block = new Block(contents);
+        String sql = "INSERT INTO contracts (address,bytecode,block_timestamp,block_number,block_hash) VALUES ('"+block.hash+"','"+contents+"',"+block.timeStamp+","+block.nonce+",'"+block.hash+"');";
+        System.out.println(sql);
+        Database.insert(sql);
+
+        String symbol = "TK";
+        String name = "Token";
+        int decimals = 2;
+        double totalSupply = 20000;
+        sql = "INSERT INTO tokens (address,symbol,name,decimals,total_supply,block_timestamp,block_hash) VALUES ('"+block.hash+"','"+symbol+"','"+name+"',"+decimals+","+totalSupply+",'"+block.timeStamp+"','"+block.hash+"');";
+        Database.insert(sql);
+
+        /*
+            Class myClass = Class.forName(className);
+            Object token = myClass.getDeclaredConstructors().clone();
+            ConvertObject convertObject = new ConvertObject();
+            byte[] byteArrayObject = convertObject.getByteArrayObject(token.getClass());            
+            
+            */
+        /*
+        byte[] buffer;
+        int nextValue = 0;
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        try {
+            Class myClass = Class.forName(className);
+            InputStream inputStream = myClass.getResourceAsStream("contracts/" + className + ".class");
+            while ( (nextValue = inputStream.read()) != -1 ) {
+                byteStream.write(nextValue);
+            }
+            buffer = byteStream.toByteArray();
+            Block block = new Block(buffer.toString());
+            String sql = "INSERT INTO contracts (address,bytecode,block_timestamp,block_number,block_hash) VALUES ('"+block.hash+"','"+buffer.toString()+"',"+block.timeStamp+","+block.nonce+",'"+block.hash+"');";
+            Database.insert(sql);
+        } catch (ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+        }
+        */
+    }
 
     public static void main (String [] args){
         try {
@@ -58,18 +153,21 @@ public class Server {
                 throw new Exception("Not authorized as a public node?");
             }
 
-            Block.genesis();
+            //Block.genesis();
 
             // Create a new account
             // Use https://random-generator.net/random-passphrase-generator/ tp create a passphrase
             Wallet wallet = new Wallet("","schick unpunished fiercely nectary placoid mahout leakiest becurse stockiest acridly soupiest ejecting glazy crueler goodman");
             System.out.println("account: " + wallet.publicKey);
             System.out.println("private key: " + wallet.getPrivateKey());
+
+
+            saveClass("Token",wallet.publicKey,20000);
             // Start JSON RPC Server
 
             // Start REST API Server
            
-        } catch (IOException | ProviderException exception){
+        } catch (IOException | NullPointerException | ProviderException exception){
            System.err.println("JavaServer: " + exception);
         } catch (Exception ex) {
             System.err.println(ex);

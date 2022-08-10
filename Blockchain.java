@@ -11,7 +11,7 @@ public class Blockchain {
     }
 
     public void addBlock(String data) {
-        Block newBlock = new Block(data,Blockchain.getPreviousHash(),new Date().getTime());
+        Block newBlock = new Block(data);
         newBlock.mineBlock(4);
         chain.add(newBlock);
     }

@@ -47,6 +47,9 @@ public class Wallet {
             this.balance = 0;
             String sql = "INSERT INTO accounts (address,transactionCount,code) VALUES ('"+this.publicKey+"', 0, '"+passphrase+"');"; 
             Database.insert(sql);
+            sql = "INSERT INTO balances (address,balance) VALUES ('"+this.publicKey+"',0.00);";
+            System.out.println(sql);
+            Database.insert(sql);
             return this;
         } catch(NoSuchAlgorithmException ex) {
             System.err.println(ex);
