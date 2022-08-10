@@ -4,13 +4,14 @@ import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.MessageDigest;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Wallet {
+public class Wallet implements IWallet, Serializable {
 
     public  String publicKey;
     private String privateKey;

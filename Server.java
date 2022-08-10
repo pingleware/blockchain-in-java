@@ -32,94 +32,38 @@ import java.io.File;  // Import the File class
 import java.io.FileNotFoundException;  // Import this class to handle errors
 import java.util.Scanner; // Import the Scanner class to read text files
 
+import javax.tools.*;
 import java.util.*;
 
-public class Server extends ClassLoader {
+import java.rmi.registry.Registry; 
+import java.rmi.registry.LocateRegistry; 
+import java.rmi.RemoteException; 
+import java.rmi.server.UnicastRemoteObject; 
 
-    private static ArrayList<String> ipAddress;
+public class Server {
 
-    @Override
-    public Class<?> findClass(String address) throws ClassNotFoundException {
-        byte[] b = loadClassFromDatabase(address);
-        return defineClass(address, b, 0, b.length);
-    }
 
-    private byte[] loadClassFromDatabase(String address)  {
-
-        byte[] buffer;
-        int nextValue = 0;
-        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-
-        try {
-            String sql = "SELECT * FROM contracts WHERE address='"+address+"';";
-            ResultSet rs = Database.query(sql);
-            InputStream inputStream = getClass().getClassLoader().getResourceAsStream(rs.getString("bytecode"));
-
-            while ( (nextValue = inputStream.read()) != -1 ) {
-                byteStream.write(nextValue);
-            }
-        } catch (SQLException | IOException e) {
-            e.printStackTrace();
-        }
-        buffer = byteStream.toByteArray();
-        return buffer;
-    }    
-
-    public static void saveClass(String className, String _owner, double _amount) {
-        String contents = "";
-
-        try {
-            File myObj = new File("contracts/" + className + ".java");
-            Scanner myReader = new Scanner(myObj);
-            while (myReader.hasNextLine()) {
-              contents += myReader.nextLine();
-            }
-            myReader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-        }  
-        System.out.println(contents);      
-        Block block = new Block(contents);
-        String sql = "INSERT INTO contracts (address,bytecode,block_timestamp,block_number,block_hash) VALUES ('"+block.hash+"','"+contents+"',"+block.timeStamp+","+block.nonce+",'"+block.hash+"');";
-        System.out.println(sql);
-        Database.insert(sql);
-
-        String symbol = "TK";
-        String name = "Token";
-        int decimals = 2;
-        double totalSupply = 20000;
-        sql = "INSERT INTO tokens (address,symbol,name,decimals,total_supply,block_timestamp,block_hash) VALUES ('"+block.hash+"','"+symbol+"','"+name+"',"+decimals+","+totalSupply+",'"+block.timeStamp+"','"+block.hash+"');";
-        Database.insert(sql);
-
-        /*
-            Class myClass = Class.forName(className);
-            Object token = myClass.getDeclaredConstructors().clone();
-            ConvertObject convertObject = new ConvertObject();
-            byte[] byteArrayObject = convertObject.getByteArrayObject(token.getClass());            
-            
-            */
-        /*
-        byte[] buffer;
-        int nextValue = 0;
-        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        try {
-            Class myClass = Class.forName(className);
-            InputStream inputStream = myClass.getResourceAsStream("contracts/" + className + ".class");
-            while ( (nextValue = inputStream.read()) != -1 ) {
-                byteStream.write(nextValue);
-            }
-            buffer = byteStream.toByteArray();
-            Block block = new Block(buffer.toString());
-            String sql = "INSERT INTO contracts (address,bytecode,block_timestamp,block_number,block_hash) VALUES ('"+block.hash+"','"+buffer.toString()+"',"+block.timeStamp+","+block.nonce+",'"+block.hash+"');";
-            Database.insert(sql);
-        } catch (ClassNotFoundException | IOException e) {
-            e.printStackTrace();
-        }
-        */
-    }
-
+    
     public static void main (String [] args){
+        try { 
+            System.setProperty("java.rmi.server.hostname","127.0.0.1");
+
+            // Instantiating the implementation class 
+            RemoteMethods obj = new RemoteMethods(); 
+       
+            // Exporting the object of implementation class  
+            // (here we are exporting the remote object to the stub) 
+            IRemoteMethods stub = (IRemoteMethods) UnicastRemoteObject.exportObject(obj, 0);  
+            
+            // Binding the remote object (stub) in the registry 
+            Registry registry = LocateRegistry.createRegistry(1337);
+            registry.bind("RemoteMethods", stub);  
+            System.err.println("Blockchain Server is ready!"); 
+         } catch (Exception e) { 
+            System.err.println("Server exception: " + e.toString()); 
+            e.printStackTrace(); 
+        }
+        /*         
         try {
             // 1. Verify the node is registered validating IP and node name gainst github.com public repository?
             // if not registered, thhrow an exception and end the program
@@ -166,12 +110,14 @@ public class Server extends ClassLoader {
             // Start JSON RPC Server
 
             // Start REST API Server
+
            
         } catch (IOException | NullPointerException | ProviderException exception){
            System.err.println("JavaServer: " + exception);
         } catch (Exception ex) {
             System.err.println(ex);
         }
+        */
     }
 
     public static int stringCompare(String str1, String str2)
@@ -202,40 +148,4 @@ public class Server extends ClassLoader {
             return 0;
         }
     }
-    
-    private static String getPublicIpAddress() {
-        String ipAddress = null;
-        try {
-            String response = sendGET("http://ip-api.com/json/");
-            String items[] = response.split("\"query\":");
-            ipAddress = items[1].substring(1,items[1].length()-2);
-        } catch (NoClassDefFoundError | Exception e) {
-            e.printStackTrace();
-        }
-        return ipAddress;
-    }
-
-    private static String sendGET(String url) throws IOException {
-		URL obj = new URL(url);
-		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-		con.setRequestMethod("GET");
-		con.setRequestProperty("User-Agent", "Mozilla/5.0");
-		int responseCode = con.getResponseCode();
-		if (responseCode == HttpURLConnection.HTTP_OK) { // success
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					con.getInputStream()));
-			String inputLine;
-			StringBuffer response = new StringBuffer();
-
-			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
-			}
-			in.close();
-
-			// print result
-            return response.toString();
-		} else {
-            return null;
-		}
-	}
 }

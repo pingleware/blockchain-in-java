@@ -36,6 +36,7 @@ To build requires Java JDK to be installed on your development machine.
     jarsigner -verbose -sigalg SHA1withRSA -tsa http://timestamp.sectigo.com?td=sha256 -digestalg SHA1 -keystore blockchain.keystore -signedjar SignedBlockchain.jar blockchain.jar blockchain
     
 ## Run an signed executable JAR from the command line
+This will start the blockchain as an RMI server
 
     java  -jar SignedBlockchain.jar
 
@@ -43,5 +44,14 @@ To build requires Java JDK to be installed on your development machine.
 
     jarsigner -verify -verbose -certs SignedBlockchain.jar
 
+## Starting Client
+The client code is located in client/Client.java and uses RMI.
+
+    java Client
+
+## Builkding the Client
+
+    cd client && javac -cp ../ Client.java && del ../Client.class && move Client.class .. && cd .. 
+    
 # Registration of a permissible node
 To prevent disruptive players from connecting with this blockchain, a public registration process is created. To participate, clone (fork) this repository, make a new entry in the blockchain.json file with your static ip address of your node, then commit and publish a change request.
