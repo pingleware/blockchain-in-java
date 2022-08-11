@@ -1,74 +1,121 @@
 {
     "0": {
-        "name": "RedeeCash ATS #0",
+        "name": "RedeeCash ATS",
         "cik": "0001766947",
         "ip": "24.254.95.149",
-        "homepage": "https://redeecash.com"
+        "homepage": "https://redeecash.com",
+        "latitude": 0,
+        "longitude": 0,
+        "type": "primary"
     },
     "1": {
-        "name": "Placeholder ATS #1",
-        "cik": "0000000001",
+        "name": "ABE ATS",
+        "cik": "00001567191",
         "ip": "8.8.8.1",
-        "homepage": "https://localhost.localdomain"
+        "homepage": "http://www.303capital.com/",
+        "location": "Chicago, IL",
+        "latitude": 0,
+        "longitude": 0,
+        "type": "node"
     },
     "2": {
-        "name": "Placeholder ATS #2",
-        "cik": "0000000002",
+        "name": "Arbor Research and Trading LLC",
+        "cik": "0000824662",
         "ip": "8.8.2.8",
-        "homepage": "https://localhost.localdomain"
+        "homepage": "https://www.arborresearch.com/",
+        "location": "Barrington, IL",
+        "latitude": 0,
+        "longitude": 0,
+        "type": "node"
     },
     "3": {
-        "name": "Placeholder ATS #3",
-        "cik": "0000000003",
+        "name": "Automated Equity Finance Markets, Inc.",
+        "cik": "00001440162",
         "ip": "8.3.8.8",
-        "homepage": "https://localhost.localdomain"
+        "homepage": "http://www.tradeaqs.com",
+        "location": "New York, NY",
+        "latitude": 0,
+        "longitude": 0,
+        "type": "node"
     },
     "4": {
-        "name": "Placeholder ATS #4",
-        "cik": "0000000004",
+        "name": "BGC Financial, L.P.",
+        "cik": "0000825904",
         "ip": "4.8.8.8",
-        "homepage": "https://localhost.localdomain"
+        "homepage": "https://www.bgcpartners.com/bgc-financial-l-p/",
+        "location": "New York, NY",
+        "latitude": 0,
+        "longitude": 0,
+        "type": "node"
     },
     "5": {
-        "name": "Placeholder ATS #5",
-        "cik": "0000000005",
+        "name": "BGC Financial L.P. Fenics Credit ATS",
+        "cik": "0000825904",
         "ip": "8.8.8.5",
-        "homepage": "https://localhost.localdomain"
+        "homepage": "https://www.bgcpartners.com/bgc-financial-l-p/",
+        "location": "New York, NY",
+        "latitude": 0,
+        "longitude": 0,
+        "type": "node"
     },
     "6": {
-        "name": "Placeholder ATS #6",
+        "name": "BrokerTec",
         "cik": "0000000006",
         "ip": "8.8.6.8",
-        "homepage": "https://localhost.localdomain"
+        "homepage": "https://www.cmegroup.com/trading/market-tech-and-data-services/brokertec.html",
+        "location": "New York, NY",
+        "latitude": 0,
+        "longitude": 0,
+        "type": "node"
     },
     "7": {
-        "name": "Placeholder ATS #7",
+        "name": "CartaX",
         "cik": "0000000007",
         "ip": "8.8.7.8",
-        "homepage": "https://localhost.localdomain"
+        "homepage": "https://cartax.com/blog/building-the-cartax-ats-with-marketgrid-technology/",
+        "location": "New York, NY",
+        "latitude": 0,
+        "longitude": 0,
+        "type": "node"
     },
     "8": {
-        "name": "Placeholder ATS #8",
+        "name": "Cicada ATS",
         "cik": "0000000008",
         "ip": "8.8.8.8",
-        "homepage": "https://localhost.localdomain"
+        "homepage": "https://cicada.io/",
+        "location": "Greenwich, CT",
+        "latitude": 0,
+        "longitude": 0,
+        "type": "node"
     },
     "9": {
-        "name": "Placeholder ATS #9",
-        "cik": "0000000009",
+        "name": "ClearList LLC",
+        "cik": "00001806092",
         "ip": "9.8.8.8",
-        "homepage": "https://localhost.localdomain"
+        "homepage": "https://www.clearlist.com/",
+        "location": " New York, NY",
+        "latitude": 0,
+        "longitude": 0,
+        "type": "node"
     },
     "10": {
-        "name": "Placeholder ATS #10",
-        "cik": "0000000010",
+        "name": "Dash Financial Technologies LLC",
+        "cik": "00001112068",
         "ip": "8.8.8.10",
-        "homepage": "https://localhost.localdomain"
+        "homepage": "https://dashfinancial.com/",
+        "location": "Chicago, IL",
+        "latitude": 0,
+        "longitude": 0,
+        "type": "node"
     },
     "11": {
-        "name": "Placeholder ATS #11",
-        "cik": "0000000011",
+        "name": "Dealerweb, Inc",
+        "cik": "0000817462",
         "ip": "8.8.11.8",
-        "homepage": "https://localhost.localdomain"
+        "homepage": "https://www.tradeweb.com/our-markets/dealerweb-wholesale/",
+        "location": "Jersey City, NJ",
+        "latitude": 0,
+        "longitude": 0,
+        "type": "node"
     }
 }
