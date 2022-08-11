@@ -8,4 +8,5 @@ public interface IRemoteMethods extends Remote {
    String getPublicIpAddress() throws RemoteException;
    Wallet addNewWallet(String passphrase) throws RemoteException;
    String saveToken(String name,String symbol,int decimals,double totalSupply) throws RemoteException;
+   String getExchangeRates(String currency) throws RemoteException;
 } 

@@ -68,6 +68,15 @@ public class RemoteMethods implements IRemoteMethods {
 
         return block.hash;
     }
+
+    public String getExchangeRates(String currency) {
+        try {
+            return sendGET("https://open.er-api.com/v6/latest/" + currency);
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
  
     private static String sendGET(String url) throws IOException {
 		URL obj = new URL(url);
