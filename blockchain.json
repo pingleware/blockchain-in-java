@@ -4,9 +4,9 @@
         "cik": "0001766947",
         "ip": "24.254.95.149",
         "homepage": "https://redeecash.com",
-        "latitude": 0,
-        "longitude": 0,
-        "type": "primary"
+        "latitude": 29.65163,
+        "longitude": -82.32483,
+        "type": "node"
     },
     "1": {
         "name": "ABE ATS",
