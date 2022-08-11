@@ -5,7 +5,7 @@ clean:
 	del blockchain.jar
 	del blockchain.mf
 	del *.class
-	del contracts/*.class
+	cd contracts && del *.class && cd ..
 	
 Block.class: Block.java
 	javac Block.java
@@ -24,6 +24,9 @@ Database.class: Database.java
 
 Wallet.class: Wallet.java IWallet.java
 	javac Wallet.java
+
+Common.class: Common.java
+	javac Common.java
 
 Server.class: Server.java
 	javac Server.java
@@ -60,7 +63,7 @@ blockchain.mf: lib/sqlite-jdbc-3.39.2.0.jar lib/json-20220320.jar
 	@echo Main-Class: Server >> blockchain.mf
 	@echo Class-Path: . contracts lib/sqlite-jdbc-3.39.2.0.jar lib/json-20220320.jar >> blockchain.mf
 
-blockchain.jar: Block.class Blockchain.class GFG.class Transaction.class Database.class Wallet.class Server.class blockchain.mf RemoteMethods.class contracts/EIP20.class contracts/EIP20Listener.class contracts/EIP721TokenReceiver.class contracts/EIP721Metadata.class contracts/EIP721Listener.class contracts/EIP721.class contracts/EIP165.class
+blockchain.jar: Block.class Blockchain.class GFG.class Transaction.class Database.class Wallet.class Server.class blockchain.mf RemoteMethods.class contracts/EIP20.class contracts/EIP20Listener.class contracts/EIP721TokenReceiver.class contracts/EIP721Metadata.class contracts/EIP721Listener.class contracts/EIP721.class contracts/EIP165.class Common.class
 	jar -cvfm blockchain.jar blockchain.mf *.class contracts/*.class
 
 blockchain.keystore: 

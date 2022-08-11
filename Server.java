@@ -43,8 +43,36 @@ import java.rmi.server.UnicastRemoteObject;
 public class Server {
 
 
-    
     public static void main (String [] args){
+        boolean _privateNode = false;
+
+        if (args.length == 1) {
+            String s1 = new String(args[0]);
+            String s2 = new String("-private");
+    
+            if ( s1.compareToIgnoreCase(s2) > 0 ) {
+                _privateNode = false;
+            } else if ( s1.compareToIgnoreCase(s2) < 0 ) {
+                _privateNode = false;
+            } else {
+                System.out.println(args[0]);
+                _privateNode = true;
+            }    
+        }
+
+        if (_privateNode == false) {
+            Common.loadValidATS();
+            String localIPAddress = Common.getPublicIpAddress();
+            boolean found = false;
+            int total = Common.ipAddress.size();
+            for (int k=0; k < total; k++) {
+                String _ip = Common.ipAddress.get(k);
+                if (Common.stringCompare(_ip,localIPAddress) != 0) {
+                    found = true;
+                    break;
+                }
+            }
+        }
         try { 
             System.setProperty("java.rmi.server.hostname","127.0.0.1");
 
@@ -57,8 +85,12 @@ public class Server {
             
             // Binding the remote object (stub) in the registry 
             Registry registry = LocateRegistry.createRegistry(1337);
-            registry.bind("RemoteMethods", stub);  
-            System.err.println("Blockchain Server is ready!"); 
+            registry.bind("RemoteMethods", stub);
+            if (_privateNode == true) {
+                System.err.println("A PRIVATE Blockchain Server is ready!"); 
+            } else {
+                System.err.println("Blockchain [PUBLIC] Server is ready!"); 
+            }
          } catch (Exception e) { 
             System.err.println("Server exception: " + e.toString()); 
             e.printStackTrace(); 
@@ -120,32 +152,4 @@ public class Server {
         */
     }
 
-    public static int stringCompare(String str1, String str2)
-    {
-  
-        int l1 = str1.length();
-        int l2 = str2.length();
-        int lmin = Math.min(l1, l2);
-  
-        for (int i = 0; i < lmin; i++) {
-            int str1_ch = (int)str1.charAt(i);
-            int str2_ch = (int)str2.charAt(i);
-  
-            if (str1_ch != str2_ch) {
-                return str1_ch - str2_ch;
-            }
-        }
-  
-        // Edge case for strings like
-        // String 1="Geeks" and String 2="Geeksforgeeks"
-        if (l1 != l2) {
-            return l1 - l2;
-        }
-  
-        // If none of the above conditions is true,
-        // it implies both the strings are equal
-        else {
-            return 0;
-        }
-    }
 }
